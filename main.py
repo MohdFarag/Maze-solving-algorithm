@@ -40,8 +40,12 @@ def planner(map: np.ndarray, start_row: int, start_column: int) -> tuple[np.ndar
     
     # Step 1: Search of 2 (goal) in map
     end_index = np.where(value_map==2)
-    end_row = end_index[0][0]
-    end_col = end_index[1][0]
+
+    if len(end_index[0]) == 0:
+        print("No goal found.")
+        return [],[]
+
+    end_row, end_col = end_index[0][0], end_index[1][0]
     end_index = (end_row, end_col)
 
     # Step 2: Filling matrix
@@ -58,13 +62,13 @@ def planner(map: np.ndarray, start_row: int, start_column: int) -> tuple[np.ndar
 
     # Set start index (destination)
     start_index = (start_row, start_column)
-    value = start_index
 
     # Step 3: Getting trajectory
     queue = [start_index]
-    visited = []
     trajectory = [start_index]
+    visited = []
     
+    value = None
     # Continue until reach to the goal
     while value != end_index:
         value = queue.pop(0)
@@ -85,20 +89,15 @@ def planner(map: np.ndarray, start_row: int, start_column: int) -> tuple[np.ndar
 # Get index of minimum neighbour value
 def get_minimum_neighbour(neighbours: list) -> tuple[int,int]:
     """Get index of minimum neighbour value"""
-    minimum_index = (0,0)
-    minimum_value = None
+    minimum_index, minimum_value = (0,0), None
     for neighbour in neighbours:
-        # Get value of neighbour
-        value = neighbour[0]
-        # Get index of neighbour
-        index = neighbour[1]
+        # Get value & index of neighbour
+        value, index = neighbour[0], neighbour[1]
        
         if minimum_value == None:
-            minimum_value = value
-            minimum_index = index
+            minimum_value, minimum_index = value, index
         elif minimum_value > value:
-            minimum_value = value
-            minimum_index = index
+            minimum_value, minimum_index = value, index
 
     return minimum_index
 
@@ -110,11 +109,9 @@ def filling_neighbours(map: np.ndarray, index: tuple[int,int], neighbour: tuple[
 
 # Check if x and y in boundaries of map or not
 def check_in_map_boundary(map: np.ndarray, index: tuple[int,int]) -> bool:
-    rows = map.shape[0]
-    cols = map.shape[1]
+    rows, cols = map.shape[0], map.shape[1]
 
-    x = index[0]
-    y = index[0]
+    x, y = index[0], index[1]
     if (x >= 0 and x < rows) and (y >= 0 and y < cols):
         return True
     else:
@@ -169,9 +166,10 @@ def draw_map(map: np.ndarray, trajectory: list, end_index: tuple[int,int]) -> No
     # Define colormap fpr every number (label2rgb)
     label2rgb_cmap = ListedColormap(['#FFFFFF', '#000083', '#80FF80', '#830000', '#0080FF'], N=5)
 
-    # Plot matrix
+    # Draw matrix
     fig, ax = plt.subplots()
     ax.imshow(map, cmap=label2rgb_cmap)
+
     if len(trajectory) == 0:
         ax.set_title("There's no path.")
     else:
@@ -187,6 +185,8 @@ def print_information(value_map: np.ndarray, trajectory: list, taken_time: float
     # Print map filled with values
     print("value_map = ")
     print(value_map)
+
+    print("") # Space
 
     # Check if there's possible trajectory or not !
     if len(trajectory) == 0:

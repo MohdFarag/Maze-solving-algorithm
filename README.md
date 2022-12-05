@@ -4,12 +4,52 @@
 
 Project that aim to find the optimal trajectory towards the goal in a finite 2D environment that is closed by obstacles, that's done by wavefront algorithm.
 
+### Args
+
+``` cmd
+python main.py [.mat file path] [variable name]
+```
+
+### Input
+
+``` terminal
+Please, Enter X coord. for start: 100
+Please, Enter Y coord. for start: 100
+```
+
+### Output
+
+``` terminal
+value_map = 
+[[1. 1. 1. ... 1. 1. 1.]
+ [1. 1. 1. ... 1. 1. 1.]
+ [1. 1. 1. ... 1. 1. 1.]
+ ...
+ [1. 1. 1. ... 1. 1. 1.]
+ [1. 1. 1. ... 1. 1. 1.]
+ [1. 1. 1. ... 1. 1. 1.]]
+trajectory =
+100 100
+99 100
+98 100
+97 100
+......
+......
+......
+100 149
+101 150
+102 151
+103 152
+Time taken: 6.2487 secs
+```
+
 ## Dependencies
 
 ``` txt
 scipy
 numpy
 matplotlib
+time
 ```
 
 ## Wavefront Algorithm
@@ -23,4 +63,6 @@ Given the start point and the goal point, the algorithm is implemented as follow
 
 ## Preview
 
-![alt text](http://url/to/img.png)
+![Figure 1](./docs/Figure_1.png)
+![Figure 3](./docs/Figure_3.png)
+![Figure 2](./docs/Figure_2.png)
