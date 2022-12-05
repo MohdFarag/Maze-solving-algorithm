@@ -1,48 +1,72 @@
+"""Maze solving Algorithm
+
+This script aim to find the optimal trajectory towards the goal in 
+a finite 2D environment that is closed by obstacles, that's done 
+by wavefront algorithm.
+
+This tool accepts (.mat) files
+
+Dependencies: `scipy`, `numpy`, `matplotlib`, `time`
+
+Contains the following primary functions:
+
+    * planner - returns value map and trajectory from map
+    * draw_map - draws map & trajectory
+    * read_information - gets map & start index from args & terminal
+    * print_information - prints value map and trajectory indices
+    * main - the main function of the script
+"""
+
 #!/usr/bin/env python3
 
-# To read .mat file
+# Read arguments
+import argparse
+# Read .mat file
 import scipy.io 
-# To compute 2d array operations
+# Compute 2d array operations
 import numpy as np 
-# To Draw map & trajectory
+# Draw map & trajectory
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+# Calculate algorithm run time
+import time
 
 ###########################################
 
-# Planner matrix -> return [value_map, trajectory]
-def planner(map, start_row, start_column):
-
-    map = np.copy(map)
-    # Search of 2 (goal) in map
-    end_index = np.where(map==2)
+# Planner function -> return [value_map, trajectory]
+def planner(map: np.ndarray, start_row: int, start_column: int) -> tuple[np.ndarray, list[tuple[int,int]]]:
+    # Copy map to not affect the original
+    value_map = np.copy(map)
+    
+    # Step 1: Search of 2 (goal) in map
+    end_index = np.where(value_map==2)
     end_row = end_index[0][0]
     end_col = end_index[1][0]
-    endIndex = (end_row, end_col)
+    end_index = (end_row, end_col)
 
-    # Filling matrix
-    queue = [endIndex]
-    visited = [endIndex]
+    # Step 2: Filling matrix
+    queue = [end_index]
+    visited = [end_index]
     while len(queue) != 0:
         value = queue.pop(0)
         visited.append(value)
-        Neighbours = getNeighbours(map, value, visited, True)
-
-        # The Neighbouring cells to the goal that are not obstacles are assigned the value of the goal point + 1
-        for Neighbour in Neighbours:
-            map = fillingNeighbours(map, value, Neighbour[1])
-            queue.append(Neighbour[1])
+        neighbours = get_neighbours(value_map, value, visited, True)
+        
+        for neighbour in neighbours:
+            value_map = filling_neighbours(value_map, value, neighbour[1])
+            queue.append(neighbour[1])
 
     # Set start index (destination)
-    startIndex = (start_row, start_column)
-    value = startIndex
+    start_index = (start_row, start_column)
+    value = start_index
 
-    # Getting trajectory
-    queue = [startIndex]
+    # Step 3: Getting trajectory
+    queue = [start_index]
     visited = []
-    trajectory = [startIndex]
+    trajectory = [start_index]
+    
     # Continue until reach to the goal
-    while value != endIndex:
+    while value != end_index:
         value = queue.pop(0)
         visited.append(value)
 
@@ -50,48 +74,54 @@ def planner(map, start_row, start_column):
         if value == None:
             trajectory = []
             break
+        
+        neighbours = get_neighbours(value_map, value, visited, False) 
+        minimum_neighbour = get_minimum_neighbour(neighbours)
+        trajectory.append(minimum_neighbour)
+        queue.append(minimum_neighbour)
 
-        Neighbours = getNeighbours(map, value, visited, False) 
-        minimumNeighbours = getMinimumNeighbours(Neighbours)
-        trajectory.append(minimumNeighbours)
-        queue.append(minimumNeighbours)
-
-    return map, trajectory[:-1]
+    return value_map, trajectory[:-1]
 
 # Get index of minimum neighbour value
-def getMinimumNeighbours(neighbours):
-    minimumIndex = None
-    minimumValue = None
+def get_minimum_neighbour(neighbours: list) -> tuple[int,int]:
+    """Get index of minimum neighbour value"""
+    minimum_index = (0,0)
+    minimum_value = None
     for neighbour in neighbours:
+        # Get value of neighbour
         value = neighbour[0]
+        # Get index of neighbour
         index = neighbour[1]
        
-        if minimumValue == None:
-            minimumValue = value
-            minimumIndex = index
-        elif minimumValue > value:
-            minimumValue = value
-            minimumIndex = index
+        if minimum_value == None:
+            minimum_value = value
+            minimum_index = index
+        elif minimum_value > value:
+            minimum_value = value
+            minimum_index = index
 
-    return minimumIndex
+    return minimum_index
 
 # Fill neighbour given value of its prev. neighbour        
-def fillingNeighbours(map, index, neighbour):
-    # Update the goal value, that is, goal = goal + 1
+def filling_neighbours(map: np.ndarray, index: tuple[int,int], neighbour: tuple[int,int]) -> np.ndarray:
+    # Update the neighbour value, that is, neighbour = index + 1
     map[neighbour] = map[index] + 1
     return map
 
-def inMap(map,x,y):
+# Check if x and y in boundaries of map or not
+def check_in_map_boundary(map: np.ndarray, index: tuple[int,int]) -> bool:
     rows = map.shape[0]
     cols = map.shape[1]
 
+    x = index[0]
+    y = index[0]
     if (x >= 0 and x < rows) and (y >= 0 and y < cols):
         return True
     else:
         return False
 
 # Get Neighbours of specific index
-def getNeighbours(map, index, visited, fillingOrPath):
+def get_neighbours(map: np.ndarray, index: tuple[int,int], visited: list, fillingOrPath: bool) -> list:
     indices = list() 
 
     # Priorities : 
@@ -110,7 +140,7 @@ def getNeighbours(map, index, visited, fillingOrPath):
     # Pop the ones (obstacles) & Neighbours that are visited
     for i in indices:
         # Check if neighbour inside the map or not
-        if inMap(map,i[0],i[1]):
+        if check_in_map_boundary(map,i):
             # Check if we fill map or get trajectory
             if fillingOrPath == True:
                 # If filling -> indices of zeros only
@@ -128,20 +158,20 @@ def getNeighbours(map, index, visited, fillingOrPath):
     return final
 
 # Draw map with trajectory from start to the goal
-def drawMap(map, trajectory, endIndex):
+def draw_map(map: np.ndarray, trajectory: list, end_index: tuple[int,int]) -> None:
     # Set trajectory with number 3
     for index in trajectory[:-1]:
         map[index] = 3
     
     # Set trajectory with number 4
-    map[endIndex] = 4 
+    map[end_index] = 4 
 
     # Define colormap fpr every number (label2rgb)
-    label2RgbCmap = ListedColormap(['#FFFFFF', '#000083', '#80FF80', '#830000', '#0080FF'], N=5)
+    label2rgb_cmap = ListedColormap(['#FFFFFF', '#000083', '#80FF80', '#830000', '#0080FF'], N=5)
 
     # Plot matrix
     fig, ax = plt.subplots()
-    ax.imshow(map, cmap=label2RgbCmap)
+    ax.imshow(map, cmap=label2rgb_cmap)
     if len(trajectory) == 0:
         ax.set_title("There's no path.")
     else:
@@ -153,7 +183,7 @@ def drawMap(map, trajectory, endIndex):
     plt.show()
 
 # Print information function
-def printInformation(value_map, trajectory):
+def print_information(value_map: np.ndarray, trajectory: list, taken_time: float):
     # Print map filled with values
     print("value_map = ")
     print(value_map)
@@ -167,24 +197,56 @@ def printInformation(value_map, trajectory):
         for index in trajectory:
             print(index[0], index[1])
 
+    print(f"Time taken: {taken_time:.5} secs")
+
+# Get arguments from terminal
+def get_args() -> tuple[str,str]:
+    parser = argparse.ArgumentParser(
+        description="",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    
+    parser.add_argument('maze', metavar='maze', help='Enter the path of the .mat file')
+    parser.add_argument('variable', metavar='var', help='Enter the name of variable that contain the map')
+    args = parser.parse_args()
+
+    return args.maze, args.variable
+
+# Get input from user
+def read_information() -> tuple[np.ndarray, tuple[int,int]]:
+    # Read .mat File
+    file_path, variable = get_args()
+    map_file = scipy.io.loadmat(file_path, mat_dtype=True)
+    maze = map_file[variable]
+
+    start_x = int(input("Please, Enter X coord. for start: "))
+    start_y = int(input("Please, Enter Y coord. for start: "))
+
+    # Start index of map
+    start_index = start_x, start_y
+
+    return maze, start_index
+
 ###########################################
 
 def main():
-    # Read .mat File
-    mapFile = scipy.io.loadmat('maze.mat', mat_dtype=True)
-    maze = mapFile['map']
-
-    # Start index of map
-    startIndex = 45, 4
+    # Get information from args & terminal
+    maze, start_index = read_information()
+    
+    start_time = time.time()
 
     # Get value map and trajectory from map
-    value_map, trajectory = planner(maze, startIndex[0], startIndex[1])
-    
-    # Print information
-    printInformation(value_map, trajectory)
+    value_map, trajectory = planner(maze, start_index[0], start_index[1])
 
-    # Plot map
-    drawMap(maze, trajectory, startIndex)
+    stop_time = time.time()
+       
+    # Print value map and trajectory indices
+    print_information(value_map, trajectory, stop_time - start_time)
+
+    # Draw map & trajectory
+    draw_map(maze, trajectory, start_index)
+
+
 
 if __name__ == "__main__":
     main()
