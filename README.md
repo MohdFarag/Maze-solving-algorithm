@@ -5,7 +5,7 @@
 
 Project that aim to find the optimal trajectory towards the goal in a finite 2D environment that is closed by obstacles, that's done by wavefront algorithm.
 
-![Figure 1](./docs/Figure_11.png)
+<p align="center" width="100%"><img src="./docs/Figure_11.png"></p>
 
 ### Args
 
