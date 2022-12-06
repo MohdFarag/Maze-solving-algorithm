@@ -63,6 +63,6 @@ Given the start point and the goal point, the algorithm is implemented as follow
 
 ## Preview
 
+<p align="center" width="100%"><img src="./docs/Figure_2.png"></p>
 ![Figure 1](./docs/Figure_1.png)
 ![Figure 3](./docs/Figure_3.png)
-![Figure 2](./docs/Figure_2.png)
