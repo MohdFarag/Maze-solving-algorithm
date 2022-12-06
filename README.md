@@ -1,8 +1,11 @@
 # Maze Solving Algorithm
 
+
 ## Overview
 
 Project that aim to find the optimal trajectory towards the goal in a finite 2D environment that is closed by obstacles, that's done by wavefront algorithm.
+
+![Figure 1](./docs/Figure_11.png)
 
 ### Args
 
@@ -65,5 +68,4 @@ Given the start point and the goal point, the algorithm is implemented as follow
 
 <p align="center" width="100%"><img src="./docs/Figure_2.png"></p>
 
-![Figure 1](./docs/Figure_1.png)
 ![Figure 3](./docs/Figure_3.png)
