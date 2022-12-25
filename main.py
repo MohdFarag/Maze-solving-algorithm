@@ -246,12 +246,5 @@ def main():
     # Draw map & trajectory
     draw_map(maze, trajectory, start_index)
 
-
-
 if __name__ == "__main__":
     main()
-
-
-
-
-
