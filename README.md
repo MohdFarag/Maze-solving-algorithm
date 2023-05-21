@@ -1,4 +1,4 @@
-# Maze Solving Algorith
+# Maze Solving Algorithm
 
 
 ## Overview
