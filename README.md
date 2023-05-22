@@ -1,4 +1,5 @@
-# Maze Solving Algorithm
+# Wavefront Algorithm for Optimal Trajectory Planning in a 2D Environment with Obstacles
+
 
 
 ## Overview
