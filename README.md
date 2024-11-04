@@ -1,9 +1,11 @@
-# Maze Solving Algorithm
+# Wavefront Algorithm for Optimal Trajectory Planning in a 2D Environment with Obstacles
+
 
 
 ## Overview
 
-Project that aim to find the optimal trajectory towards the goal in a finite 2D environment that is closed by obstacles, that's done by wavefront algorithm.
+This project aims to develop a solution for finding the optimal trajectory towards a goal in a 2D environment that is closed by obstacles. The proposed approach utilizes the Wavefront Algorithm, a popular pathfinding algorithm that effectively navigates through complex environments.
+
 
 <p align="center" width="100%"><img src="./docs/Figure_11.png"></p>
 
