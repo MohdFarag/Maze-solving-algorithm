@@ -23,7 +23,7 @@ Please, Enter Y coord. for start: 100
 ### Output
 
 ``` terminal
-value_map = 
+value_map =
 [[1. 1. 1. ... 1. 1. 1.]
  [1. 1. 1. ... 1. 1. 1.]
  [1. 1. 1. ... 1. 1. 1.]
