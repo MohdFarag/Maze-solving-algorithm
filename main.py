@@ -16,6 +16,7 @@ Contains the following primary functions:
     * print_information - prints value map and trajectory indices
     * main - the main function of the script
 """
+
 # Calculate algorithm run time
 import time
 # Planner Functions
